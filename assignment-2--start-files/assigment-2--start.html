@@ -113,29 +113,29 @@
             // () => ({}); // returns an empty object.
             // You need the parentheses around the braces because otherwise js thinks it's a code block
 
-            let currentIndex = 0;
+            let currentIndex = null; // null so that we know no thumbnail is active before firstLoad
             // .length is the length of the array
             // -1 because '0' is also an index number
             const lastIndex = dndClassNames.length - 1;
 
             const firstLoad = () => {
-                // *** set the main image to the first image in the array (index 0) ***
-                // we are accessing the source of the image using .src
-                // our classes are in an array, so we need to get the 0th index
-                // since we used an object to hold the image sources, we need to access ".fullImage"
-                // once we get the image path from ".fullImage", we assign it to the images ".src"
-                document.querySelector( '#main-image' ).src = dataBuckets[0].fullImage;
                 // *** set the thumbnail images ***
                 initializeThumbnails();
+                // *** set the main image to the first image in the array (index 0) ***
+                setNav( 0 );
                 // When clicked it calls our First,Prev,Next & Last functions
                 document.querySelector( '#first-btn' ).addEventListener( 'click', setNavFirst );
                 document.querySelector( '#prev-btn' ).addEventListener( 'click', setNavPrev );
                 document.querySelector( '#next-btn' ).addEventListener( 'click', setNavNext );
                 document.querySelector( '#last-btn' ).addEventListener( 'click', setNavLast );
             };
-
+            
             const setMainImage = ( index ) => {
-                // set the main-image src image based on the passed parameter
+                // *** set the main-image src image based on the passed parameter ***
+                // we are accessing the source of the image using .src
+                // our classes are in an array, so we need to get the right index
+                // since we used an object to hold the image sources, we need to access ".fullImage"
+                // once we get the image path from ".fullImage", we assign it to the images ".src"
                 document.querySelector( '#main-image' ).src = dataBuckets[index].fullImage;
             };
 
@@ -158,12 +158,20 @@
             // I know the point is to learn loops but it seemed better without one
             // plus we used .forEach already above :)
             const setSelectedThumbnail = ( indexToSetActive, indexToSetInactive ) => {
+                if ( indexToSetActive == indexToSetInactive ) {
+                    return; // if we clicked the thumbnail we're already on - don't need to change anything
+                }
+
                 // get a reference to the thumbnail we want to set as active
                 // get the data bucket at index "indexToSetActive" and grab just the thumbElement from that
                 const thumbToSetActive = dataBuckets[indexToSetActive].thumbElement;
                 // set that thumbnail as active
                 //     aka: give it the class that makes it look active
                 thumbToSetActive.className = 'selected-thumbnail';
+
+                if ( indexToSetInactive == null ) {
+                    return; // if we don't have anything to set inactive, just bail
+                }
 
                 // get a reference to the thumbnail that was previously set as active
                 const thumbToSetInactive = dataBuckets[indexToSetInactive].thumbElement;
