@@ -30,11 +30,14 @@
             #thumbnail-area > img {
                 height: 75px;
                 width: 75px;
-                filter: grayscale(1);
+                filter: grayscale(1) brightness(0.8);
+                border-radius: 0.25em;
             }
 
             #thumbnail-area > img.selected-thumbnail {
                 filter: none;
+                /* x, y, spread color */
+                box-shadow: 0 0 10px black;
             }
         </style>
 
