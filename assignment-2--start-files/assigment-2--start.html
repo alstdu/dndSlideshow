@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>MDIA 2294</title>
+
+        <style>
+            body {
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            img {
+                margin: 5px;
+            }
+
+            img.clickable {
+                cursor: pointer;
+            }
+
+            #main-image {
+                height: 300px;
+            }
+
+            #thumbnail-area > img {
+                height: 75px;
+                width: 75px;
+                filter: grayscale(1);
+            }
+
+            .selected-thumbnail {
+                filter: none;
+            }
+        </style>
+
+    </head>
+    <body>
+
+        <h1>MDIA 2294: Assignment 2</h1>
+
+        <div style="text-align:center;">
+            <!-- tables are for tabular data :'( -->
+            <table>
+                <tr>
+                    <td></td>
+                    <td style="text-align:center;">
+                        <div><img id="main-image" alt="Main Image" /></div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="images/first.png" id="first-btn" />
+                        <img src="images/prev.png" id="prev-btn" />
+                    </td>
+                    <td>
+                        <div id="thumbnail-area"></div>
+                    </td>
+                    <td>
+                        <img src="images/next.png" id="next-btn" />
+                        <img src="images/last.png" id="last-btn" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script>
+            // Lexi Dugo A01348881 Assignment 2 - Slideshow
+
+            // side note: what do I call this array? what are these objects?
+            // like they aren't d&d classes because those would have properties like "hit die" and "abilities"
+            // not "thumbnail source" - so is it like dndClassImageInfo? That sounds weird. Naming things is hard.
+            // const ????? = [
+            //     {
+            //         name: 'barbarian',
+            //         thumbnailSource: './images/barbarian-thumb.jpeg',
+            //         fullImage: './images/barbarian-full.png'
+            //     },
+            //     {
+            //         name: 'bard',
+            //         thumbnailSource: './images/bard-thumb.jpeg',
+            //         fullImage: './images/bard-full.png'
+            //     },
+            //     // ... wow this is taking forever... what if I made it with js !?
+            // ];
+
+            // let's just list the class names because they'll tell us the image sources
+            const dndClassNames = [
+                'barbarian', 'bard', 'cleric', 'druid', 'monk', 'ranger', 'warlock',
+            ];
+            // now we can get the images sources by adding the name to boilerplate - and we get these nice objects
+            // map is a method on arrays
+            //      going to return a new array that has a different, new value for every old value
+            //      in the array map was called on
+            // naming is hard so this is "dataBuckets"
+            const dataBuckets = dndClassNames.map( ( dndClassName ) => ( {
+                dndClassName,
+                thumbnailSource: `./images/${dndClassName}-thumb.jpeg`,
+                fullImage: `./images/${dndClassName}-full.png`,
+                // TO(never)DO: consider a rewrite so that this doesn't need to be null here
+                thumbElement: null, // TODO: we will populate this in initializeThumbnails
+            } ) );
+
+            // the above callback function in .map is an arrow function using *implicit return*
+            // () => 1; // returns 1 implicitly because it's not inside braces so we don't need the return keyword
+            // () => ({}); // returns an empty object.
+            // You need the parentheses around the braces because otherwise js thinks it's a code block
+
+            let currentIndex = 0;
+            // .length is the length of the array
+            // -1 because '0' is also an index number
+            const lastIndex = dndClassNames.length - 1;
+
+            const firstLoad = () => {
+                // *** set the main image to the first image in the array (index 0) ***
+                // we are accessing the source of the image using .src
+                // our classes are in an array, so we need to get the 0th index
+                // since we used an object to hold the image sources, we need to access ".fullImage"
+                // once we get the image path from ".fullImage", we assign it to the images ".src"
+                document.querySelector( '#main-image' ).src = dataBuckets[0].fullImage;
+                // *** set the thumbnail images ***
+                initializeThumbnails();
+                // When clicked it calls our First,Prev,Next & Last functions
+                document.querySelector( '#first-btn' ).addEventListener( 'click', setNavFirst );
+                document.querySelector( '#prev-btn' ).addEventListener( 'click', setNavPrev );
+                document.querySelector( '#next-btn' ).addEventListener( 'click', setNavNext );
+                document.querySelector( '#last-btn' ).addEventListener( 'click', setNavLast );
+            };
+
+            const setMainImage = ( index ) => {
+                // set the main-image src image based on the passed parameter
+                document.querySelector( '#main-image' ).src = dataBuckets[index].fullImage;
+            };
+
+            const initializeThumbnails = () => {
+                // *** set the thumbnail images ***
+                // we first need to grab the new objects we created using .map
+                // then for each thumbnailSource, create an image tag and set the src
+                dataBuckets.map( ( bucket ) => bucket.thumbnailSource ).forEach( ( thumb, i ) => {
+                    // create an img tag using createElement
+                    const imgTag = document.createElement( 'img' );
+                    // give that img tag a src of thumb
+                    // thumb in this case will be the thumbnailSource strings we grabbed earlier
+                    imgTag.src = thumb;
+                    // add an event listener so that something can happen when we click on the thumbs
+                    imgTag.addEventListener( 'click', () => setNav( i ) );
+                    // append that image tag to the DOM in the right place
+                    // in this case it is the div thumbnail-area
+                    document.querySelector( '#thumbnail-area' ).appendChild( imgTag );
+                } );
+            };
+
+            // I know the point is to learn loops but it seemed better without one
+            // plus we used loops already above :)
+            const setSelectedThumbnail = ( index, previousIndex ) => {
+                // TODO: get a reference to the thumbnail we want to set as active
+                // TODO: set that thumbnail as active
+                // TODO: get a reference to the thumbnail that was previously set as active
+                // TODO: set that previously active thumbnail to inactive
+            };
+
+            // handle changing current index and updating UI in one place
+            const setNav = ( index ) => {
+                const previousIndex = currentIndex;
+                currentIndex = index;
+                setMainImage( currentIndex );
+                setSelectedThumbnail( currentIndex, previousIndex );
+            };
+
+            // navigate to the first image (this is the easy one since it's always index zero)
+            const setNavFirst = () => {
+                setNav( 0 );
+            };
+
+            // navigate to the last image (should work for any size array)
+            const setNavLast = () => {
+                setNav( lastIndex );
+            };
+
+            // move to the next image, unless at the end in which case show the first image
+            const setNavNext = () => {
+                // current index plus 1 unless current index is already last in which case 0
+                // condition ? if true : if false
+                const nextIndex = ( currentIndex == lastIndex ) ? 0 : currentIndex + 1;
+                setNav( nextIndex );
+            };
+
+            // move to the previous image, unless at the end in which case show the last image
+            const setNavPrev = () => {
+                // current index minus 1 unless current index is already 0 in which case last index
+                // condition ? if true : if false
+                const prevIndex = ( currentIndex == 0 ) ? lastIndex : currentIndex - 1;
+                setNav( prevIndex );
+            };
+
+            window.addEventListener( 'load', firstLoad );
+
+
+        </script>
+
+    </body>
+</html>
