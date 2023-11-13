@@ -26,13 +26,14 @@
                 height: 300px;
             }
 
+            /* styles the disabled thumbnails */
             #thumbnail-area > img {
                 height: 75px;
                 width: 75px;
                 filter: grayscale(1);
             }
 
-            .selected-thumbnail {
+            #thumbnail-area > img.selected-thumbnail {
                 filter: none;
             }
         </style>
@@ -101,7 +102,7 @@
                 thumbnailSource: `./images/${dndClassName}-thumb.jpeg`,
                 fullImage: `./images/${dndClassName}-full.png`,
                 // TO(never)DO: consider a rewrite so that this doesn't need to be null here
-                thumbElement: null, // TODO: we will populate this in initializeThumbnails
+                thumbElement: document.createElement( 'img' ), // we will add to this in initializeThumbnails
             } ) );
 
             // the above callback function in .map is an arrow function using *implicit return*
@@ -137,14 +138,12 @@
 
             const initializeThumbnails = () => {
                 // *** set the thumbnail images ***
-                // we first need to grab the new objects we created using .map
-                // then for each thumbnailSource, create an image tag and set the src
-                dataBuckets.map( ( bucket ) => bucket.thumbnailSource ).forEach( ( thumb, i ) => {
-                    // create an img tag using createElement
-                    const imgTag = document.createElement( 'img' );
-                    // give that img tag a src of thumb
-                    // thumb in this case will be the thumbnailSource strings we grabbed earlier
-                    imgTag.src = thumb;
+                dataBuckets.forEach( ( bucket, i ) => {
+                    // get the imgTag we created with the bucket
+                    const imgTag = bucket.thumbElement;
+                    // give that img tag a src
+                    // in this case will be the thumbnailSource string
+                    imgTag.src = bucket.thumbnailSource;
                     // add an event listener so that something can happen when we click on the thumbs
                     imgTag.addEventListener( 'click', () => setNav( i ) );
                     // append that image tag to the DOM in the right place
@@ -154,20 +153,27 @@
             };
 
             // I know the point is to learn loops but it seemed better without one
-            // plus we used loops already above :)
-            const setSelectedThumbnail = ( index, previousIndex ) => {
-                // TODO: get a reference to the thumbnail we want to set as active
-                // TODO: set that thumbnail as active
-                // TODO: get a reference to the thumbnail that was previously set as active
-                // TODO: set that previously active thumbnail to inactive
+            // plus we used .forEach already above :)
+            const setSelectedThumbnail = ( indexToSetActive, indexToSetInactive ) => {
+                // get a reference to the thumbnail we want to set as active
+                // get the data bucket at index "indexToSetActive" and grab just the thumbElement from that
+                const thumbToSetActive = dataBuckets[indexToSetActive].thumbElement;
+                // set that thumbnail as active
+                //     aka: give it the class that makes it look active
+                thumbToSetActive.className = 'selected-thumbnail';
+
+                // get a reference to the thumbnail that was previously set as active
+                const thumbToSetInactive = dataBuckets[indexToSetInactive].thumbElement;
+                // set that previously active thumbnail to inactive
+                thumbToSetInactive.removeAttribute( 'class' );
             };
 
             // handle changing current index and updating UI in one place
             const setNav = ( index ) => {
-                const previousIndex = currentIndex;
+                const oldIndex = currentIndex;
                 currentIndex = index;
                 setMainImage( currentIndex );
-                setSelectedThumbnail( currentIndex, previousIndex );
+                setSelectedThumbnail( currentIndex, oldIndex );
             };
 
             // navigate to the first image (this is the easy one since it's always index zero)
@@ -197,7 +203,6 @@
             };
 
             window.addEventListener( 'load', firstLoad );
-
 
         </script>
 
